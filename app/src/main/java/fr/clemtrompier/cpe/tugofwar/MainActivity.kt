@@ -25,6 +25,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -55,7 +56,7 @@ fun MainScreen() {
     // Hoist the state for IP and port here
     var ipValue by remember { mutableStateOf("") }
     var portValue by remember { mutableStateOf("") }
-    var player by remember { mutableStateOf("") }
+    var player by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -127,7 +128,7 @@ fun IPInputSection(
 fun UDPActionSection(
     ip: String,
     port: String,
-    player: String
+    player: Int
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -142,7 +143,7 @@ fun UDPActionSection(
                 if (ip.isNotBlank() && port.isNotBlank()) {
                     // Run the network operation on a background thread.
                     Thread {
-                        sendUDPMessage(ip, port, player)
+                        sendUDPMessage(ip, port, "($player)")
                     }.start()
                 }
             }
@@ -169,8 +170,8 @@ fun sendUDPMessage(ip: String, port: String, message: String) {
 
 @Composable
 fun PlayerSelector(
-    player: String,
-    onPlayerChange: (String) -> Unit
+    player: Int,
+    onPlayerChange: (Int) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -184,17 +185,19 @@ fun PlayerSelector(
     ) {
         PlayerIcon(
             player = "Player 1",
-            isSelected = player == "(1)",
+            playerValue = 1,
+            isSelected = player == 1,
             onPlayerChange = onPlayerChange
         )
         Spacer(modifier = Modifier.width(16.dp))
         PlayerIcon(
             player = "Player 2",
-            isSelected = player == "(2)",
+            playerValue = 2,
+            isSelected = player == 2,
             onPlayerChange = onPlayerChange
         )
     }
-        Button(onClick = { onPlayerChange("") }) {
+        Button(onClick = { onPlayerChange(0) }) {
             Text("Reset Player")
         } }
 
@@ -203,13 +206,14 @@ fun PlayerSelector(
 @Composable
 fun PlayerIcon(
     player: String,
+    playerValue: Int,
     isSelected: Boolean,
-    onPlayerChange: (String) -> Unit
+    onPlayerChange: (Int) -> Unit
 ) {
     Column(
         modifier = Modifier
             .padding(8.dp)
-            .clickable { onPlayerChange(player) }
+            .clickable { onPlayerChange(playerValue) }
             .background(if (isSelected) Color.Gray else Color.Transparent)
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
