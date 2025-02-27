@@ -64,6 +64,8 @@ fun MainScreen() {
             .padding(16.dp)
     ) {
 
+        Spacer(modifier = Modifier.weight(1f))
+
         // Composable for setting the IP and port
         IPInputSection(
             ip = ipValue,
@@ -87,6 +89,8 @@ fun MainScreen() {
             player = player,
             onPlayerChange = { player = it }
         )
+
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
